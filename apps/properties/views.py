@@ -16,7 +16,6 @@ from .serializers import (PropertyCreateSerializer, PropertySerializer,
 
 logger = logging.getLogger(__name__)
 
-
 class PropertyFilter(django_filters.FilterSet):
 
     advert_type = django_filters.CharFilter(
@@ -35,7 +34,6 @@ class PropertyFilter(django_filters.FilterSet):
         model = Property
         fields = ["advert_type", "property_type", "price"]
 
-
 class ListAllPropertiesAPIView(generics.ListAPIView):
     serializer_class = PropertySerializer
     queryset = Property.objects.all().order_by("-created_at")
@@ -49,7 +47,6 @@ class ListAllPropertiesAPIView(generics.ListAPIView):
     filterset_class = PropertyFilter
     search_fields = ["country", "city"]
     ordering_fields = ["created_at"]
-
 
 class ListAgentsPropertiesAPIView(generics.ListAPIView):
 
@@ -68,7 +65,6 @@ class ListAgentsPropertiesAPIView(generics.ListAPIView):
         user = self.request.user
         queryset = Property.objects.filter(user=user).order_by("-created_at")
         return queryset
-
 
 class PropertyViewsAPIView(generics.ListAPIView):
     serializer_class = PropertyViewSerializer
@@ -95,7 +91,6 @@ class PropertyDetailView(APIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
 @api_view(["PUT"])
 @permission_classes([permissions.IsAuthenticated])
 def update_property_api_view(request, slug):
@@ -117,7 +112,6 @@ def update_property_api_view(request, slug):
         serializer.save()
         return Response(serializer.data)
 
-
 @api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
 def create_property_api_view(request):
@@ -134,7 +128,6 @@ def create_property_api_view(request):
         return Response(serializer.data)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 @api_view(["DELETE"])
 @permission_classes([permissions.IsAuthenticated])
@@ -160,7 +153,6 @@ def delete_property_api_view(request, slug):
             data["failure"] = "Deletion failed"
         return Response(data=data)
 
-
 @api_view(["POST"])
 def uploadPropertyImage(request):
     data = request.data
@@ -183,7 +175,7 @@ class PropertySearchAPIView(APIView):
     def post(self, request):
         queryset = Property.objects.filter(published_status=True)
         data = self.request.data
-
+        
         advert_type = data["advert_type"]
         queryset = queryset.filter(advert_type__iexact=advert_type)
 

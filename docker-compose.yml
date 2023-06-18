@@ -19,3 +19,27 @@ services:
             - redis
         networks:
             - estate-react
+
+    client:
+        build:
+            context: ./client
+            dockerfile: ./docker/local/Dockerfile
+        restart: on-failure
+        volumes:
+            - ./client:/app
+            - /app/node_modules
+        networks:
+            - estate-react
+            
+    postgres-db:
+        image: postgres:12.0-alpine
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+        environment:
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            - POSTGRES_DB=${POSTGRES_DB}
+        networks:
+            - estate-react

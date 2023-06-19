@@ -44,11 +44,63 @@ services:
         networks:
             - estate-react
 
-    networks:
+    redis:
+        image: redis:5-alpine
+        networks:
+            - estate-react
+
+    celery_worker:
+        build:
+            context: .
+            dockerfile: ./docker/local/django/Dockerfile
+        command: /start-celeryworker
+        volumes:
+            - .:/app
+        env_file:
+            - .env
+        depends_on:
+            - redis
+            - postgres-db
+        networks:
+            - estate-react
+
+    flower:
+        build:
+            context: .
+            dockerfile: ./docker/local/django/Dockerfile
+        command: /start-flower
+        volumes:
+            - .:/app
+        env_file:
+            - .env
+        ports:
+            - "5557:5555"
+        depends_on:
+            - redis
+            - postgres-db
+        networks:
+            - estate-react
+
+    nginx:
+        restart: always
+        depends_on:
+            - api
+        volumes:
+            - static_volume:/app/staticfiles
+            - media_volume:/app/mediafiles
+        build:
+            context: ./docker/local/nginx
+            dockerfile: Dockerfile
+        ports:
+            - "8080:80"
+        networks:
+            - estate-react
+
+networks:
     estate-react:
         driver: bridge
 
-    volumes:
-        postgres_data:
-        static_volume:
-        media_volume:
+volumes:
+    postgres_data:
+    static_volume:
+    media_volume:
